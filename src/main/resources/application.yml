@@ -11,8 +11,8 @@ spring:
     password:
   h2:
     console:
-      enabled: true  # H2 Console? ???? ??
-      path: /h2-console  # H2 Console? Path
+      enabled: true  # H2 Console
+      path: /h2-console  # H2 Console Path
   batch:
     jdbc:
       initialize-schema: always
