@@ -26,9 +26,8 @@ public class BasicTaskJobConfiguration {
     }
 
     @Bean
-    public Step step(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step myStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         log.info("------------------ Init myStep -----------------");
-
         return new StepBuilder("myStep", jobRepository)
                 .tasklet(greetingTasklet(), transactionManager)
                 .build();

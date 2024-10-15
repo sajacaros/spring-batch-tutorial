@@ -18,6 +18,7 @@ public class GreetingTask implements Tasklet, InitializingBean {
         log.info("GreetingTask: {}, {}", contribution, chunkContext);
 
         return RepeatStatus.FINISHED;
+//        return RepeatStatus.CONTINUABLE;
     }
 
     @Override
