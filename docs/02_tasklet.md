@@ -172,3 +172,5 @@ public class BasicTaskJobConfiguration {
 - JobRepository
   - 배치 실행정보나 상태, 결과정보들이 데이터베이스에 저장하는 저장소
   - 저장된 정보를 활용하여 스프링배치는 배치 잡을 재실행 하거나, 정지된 상태 후부터 수행할 수 있는 수단을 제공
+# 실행
+- ![](images/web_execution.png)

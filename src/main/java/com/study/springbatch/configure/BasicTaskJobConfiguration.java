@@ -30,6 +30,7 @@ public class BasicTaskJobConfiguration {
         log.info("------------------ Init myStep -----------------");
         return new StepBuilder("myStep", jobRepository)
                 .tasklet(greetingTasklet(), transactionManager)
+//                .allowStartIfComplete(true)
                 .build();
     }
 
