@@ -16,9 +16,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @Slf4j
-//@Configuration
+@Configuration
 public class BasicTaskJobConfiguration {
-//    @Autowired
+    @Autowired
     PlatformTransactionManager transactionManager;
 
     @Bean
@@ -31,7 +31,7 @@ public class BasicTaskJobConfiguration {
         log.info("------------------ Init myStep -----------------");
         return new StepBuilder("myStep", jobRepository)
                 .tasklet(greetingTasklet(), transactionManager)
-//                .allowStartIfComplete(true)
+                .allowStartIfComplete(true)
                 .build();
     }
 
