@@ -16,6 +16,7 @@ public class GreetingTask implements Tasklet, InitializingBean {
     ) throws Exception {
         log.info("------------------ Task Execute -----------------");
         log.info("GreetingTask: {}, {}", contribution, chunkContext);
+        Thread.sleep(10000);
 
         return RepeatStatus.FINISHED;
 //        return RepeatStatus.CONTINUABLE;
