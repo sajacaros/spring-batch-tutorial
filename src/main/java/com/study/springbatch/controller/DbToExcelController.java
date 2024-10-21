@@ -1,6 +1,7 @@
 package com.study.springbatch.controller;
 
 import com.study.springbatch.dto.DatabaseConfig;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -23,7 +24,7 @@ public class DbToExcelController {
     private Job tableMetadataJob;
 
     @PostMapping(value = "/metadata", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String exportMetadata(@RequestBody DatabaseConfig config) {
+    public String exportMetadata(@RequestBody @Valid DatabaseConfig config) {
 
         try {
             // Job을 실행하면서 동적으로 생성된 DataSource를 사용하도록 설정
@@ -32,6 +33,7 @@ public class DbToExcelController {
                     .addString("username", config.getUsername())
                     .addString("password", config.getPassword())
                     .addString("filePath", config.getFilePath())
+                    .addString("schema", config.getSchema())
                     .addLong("time", System.currentTimeMillis())
                     .toJobParameters());
 

@@ -21,12 +21,22 @@ import org.springframework.transaction.PlatformTransactionManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
-import static com.study.springbatch.util.DynamicDataConfig.createDataSource;
-import static com.study.springbatch.util.DynamicDataConfig.createSqlSessionFactory;
+import static com.study.springbatch.util.DynamicDataConfig.*;
 
 @Configuration
 public class DbToExcelConfiguration {
+    private static final Map<String, String> DB_TYPE_TO_QUERY_ID_MAP = new HashMap<>();
+
+    static {
+        DB_TYPE_TO_QUERY_ID_MAP.put("postgresql", "com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadataPostgresql");
+        DB_TYPE_TO_QUERY_ID_MAP.put("oracle", "com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadataOracle");
+        DB_TYPE_TO_QUERY_ID_MAP.put("mysql", "com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadataMysql");
+    }
+
     @Bean
     public Job tableMetadataJob(JobRepository jobRepository, Step metadataToExcelStep) {
         return new JobBuilder("tableMetadataJob", jobRepository)
@@ -49,12 +59,19 @@ public class DbToExcelConfiguration {
     public MyBatisCursorItemReader<TableMetadata> tableMetadataReader(
             @Value("#{jobParameters['url']}") String url,
             @Value("#{jobParameters['username']}") String username,
-            @Value("#{jobParameters['password']}") String password
+            @Value("#{jobParameters['password']}") String password,
+            @Value("#{jobParameters['schema']}") String schema
     ) throws Exception {
-
         MyBatisCursorItemReader<TableMetadata> reader = new MyBatisCursorItemReader<>();
         reader.setSqlSessionFactory(createSqlSessionFactory(createDataSource(url, username, password)));
-        reader.setQueryId("com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadata");
+        String dbType = extractDbType(url);
+        String queryId = DB_TYPE_TO_QUERY_ID_MAP.get(dbType);
+        if (queryId == null) {
+            throw new IllegalArgumentException("Unsupported DB type: " + dbType);
+        }
+
+        reader.setQueryId(queryId);
+        reader.setParameterValues(Collections.singletonMap("schema", schema));
         return reader;
     }
 
