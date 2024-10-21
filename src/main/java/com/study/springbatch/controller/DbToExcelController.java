@@ -28,14 +28,17 @@ public class DbToExcelController {
 
         try {
             // Job을 실행하면서 동적으로 생성된 DataSource를 사용하도록 설정
-            jobLauncher.run(tableMetadataJob, new JobParametersBuilder()
-                    .addString("url", config.getUrl())
-                    .addString("username", config.getUsername())
-                    .addString("password", config.getPassword())
-                    .addString("filePath", config.getFilePath())
-                    .addString("schema", config.getSchema())
-                    .addLong("time", System.currentTimeMillis())
-                    .toJobParameters());
+            jobLauncher.run(
+                    tableMetadataJob,
+                    new JobParametersBuilder()
+                            .addString("url", config.getUrl())
+                            .addString("username", config.getUsername())
+                            .addString("password", config.getPassword())
+                            .addString("filePath", config.getFilePath())
+                            .addString("schema", config.getSchema())
+                            .addLong("time", System.currentTimeMillis())
+                            .toJobParameters()
+            );
 
             return "Batch job executed successfully!";
         } catch (Exception e) {

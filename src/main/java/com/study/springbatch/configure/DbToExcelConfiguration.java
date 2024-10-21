@@ -1,6 +1,8 @@
 package com.study.springbatch.configure;
 
+import com.study.springbatch.QueryIdWithDB;
 import com.study.springbatch.vo.TableMetadata;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -8,10 +10,13 @@ import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -22,34 +27,34 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.study.springbatch.util.DynamicDataConfig.*;
 
 @Configuration
+@Slf4j
 public class DbToExcelConfiguration {
-    private static final Map<String, String> DB_TYPE_TO_QUERY_ID_MAP = new HashMap<>();
-
-    static {
-        DB_TYPE_TO_QUERY_ID_MAP.put("postgresql", "com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadataPostgresql");
-        DB_TYPE_TO_QUERY_ID_MAP.put("oracle", "com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadataOracle");
-        DB_TYPE_TO_QUERY_ID_MAP.put("mysql", "com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadataMysql");
-    }
 
     @Bean
     public Job tableMetadataJob(JobRepository jobRepository, Step metadataToExcelStep) {
+        log.info("===== tableMetadataJob =====");
         return new JobBuilder("tableMetadataJob", jobRepository)
                 .start(metadataToExcelStep)
                 .build();
     }
 
     @Bean
+    @JobScope
     public Step metadataToExcelStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
-                                    MyBatisCursorItemReader<TableMetadata> reader, ItemWriter<TableMetadata> writer) {
+                                    MyBatisCursorItemReader<TableMetadata> reader,
+                                    ItemProcessor<TableMetadata, TableMetadata> processor,
+                                    ItemWriter<TableMetadata> writer
+    ) {
+        log.info("===== metadataToExcelStep =====");
         return new StepBuilder("metadataToExcelStep", jobRepository)
-                .<TableMetadata, TableMetadata>chunk(1000, transactionManager)
+                .<TableMetadata, TableMetadata>chunk(100, transactionManager)
                 .reader(reader)
+                .processor(processor)
                 .writer(writer)
                 .build();
     }
@@ -62,14 +67,10 @@ public class DbToExcelConfiguration {
             @Value("#{jobParameters['password']}") String password,
             @Value("#{jobParameters['schema']}") String schema
     ) throws Exception {
+        log.info("===== reader =====");
         MyBatisCursorItemReader<TableMetadata> reader = new MyBatisCursorItemReader<>();
         reader.setSqlSessionFactory(createSqlSessionFactory(createDataSource(url, username, password)));
-        String dbType = extractDbType(url);
-        String queryId = DB_TYPE_TO_QUERY_ID_MAP.get(dbType);
-        if (queryId == null) {
-            throw new IllegalArgumentException("Unsupported DB type: " + dbType);
-        }
-
+        String queryId = QueryIdWithDB.fromDbType(extractDbType(url)).getQueryId();
         reader.setQueryId(queryId);
         reader.setParameterValues(Collections.singletonMap("schema", schema));
         return reader;
@@ -77,9 +78,22 @@ public class DbToExcelConfiguration {
 
     @Bean
     @StepScope
-    public ItemWriter<TableMetadata> excelWriter(@Value("#{jobParameters['filePath']}") String filePath) {
-        return items -> {
+    public ItemProcessor<TableMetadata, TableMetadata> processor() {
+        log.info("===== processor =====");
+        final AtomicInteger counter = new AtomicInteger(0);
+        return item -> {
+            log.info("===== processor:{} =====", counter.incrementAndGet());
+            return item;
+        };
+    }
 
+    @Bean
+    @StepScope
+    public ItemWriter<TableMetadata> excelWriter(@Value("#{jobParameters['filePath']}") String filePath) {
+        log.info("===== writer =====");
+        final AtomicInteger counter = new AtomicInteger(0);
+        return items -> {
+            log.info("===== writer:{} =====", counter.incrementAndGet());
             // 파일 경로 유효성 검증
             File file = new File(filePath);
             File parentDir = file.getParentFile();
