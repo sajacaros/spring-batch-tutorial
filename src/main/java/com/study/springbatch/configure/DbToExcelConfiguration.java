@@ -7,8 +7,11 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.mybatis.spring.batch.MyBatisCursorItemReader;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -23,6 +26,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
@@ -47,9 +51,19 @@ public class DbToExcelConfiguration {
     public Step metadataToExcelStep(JobRepository jobRepository, PlatformTransactionManager transactionManager,
                                     MyBatisCursorItemReader<TableMetadata> reader,
                                     ItemProcessor<TableMetadata, TableMetadata> processor,
-                                    ItemWriter<TableMetadata> writer
+                                    ItemWriter<TableMetadata> writer,
+                                    @Value("#{jobParameters['filePath']}") String filePath
     ) {
         log.info("===== metadataToExcelStep =====");
+        // Job 시작 전에 파일 삭제
+        File file = new File(filePath);
+        if (file.exists()) {
+            if (file.delete()) {
+                log.info("기존 파일 {} 삭제 완료", filePath);
+            } else {
+                log.warn("파일 {} 삭제 실패", filePath);
+            }
+        }
         return new StepBuilder("metadataToExcelStep", jobRepository)
                 .<TableMetadata, TableMetadata>chunk(100, transactionManager)
                 .reader(reader)
@@ -91,25 +105,28 @@ public class DbToExcelConfiguration {
     public ItemWriter<TableMetadata> excelWriter(@Value("#{jobParameters['filePath']}") String filePath) {
         log.info("===== writer =====");
         final AtomicInteger counter = new AtomicInteger(0);
+
         return items -> {
             log.info("===== writer:{} =====", counter.incrementAndGet());
-            // 파일 경로 유효성 검증
+
             File file = new File(filePath);
             File parentDir = file.getParentFile();
             if (!parentDir.exists()) {
                 parentDir.mkdirs(); // 디렉토리가 없으면 생성
             }
 
-            try (Workbook workbook = new SXSSFWorkbook()) { // 메모리 효율을 위한 SXSSFWorkbook 사용
-                Sheet sheet = workbook.createSheet("Table Metadata");
+            try (Workbook workbook = (file.exists()) ? new XSSFWorkbook(new FileInputStream(file)) : new XSSFWorkbook()) {
+                Sheet sheet = (file.exists()) ? workbook.getSheetAt(0) : workbook.createSheet("Table Metadata");
 
-                // 헤더 생성
-                Row header = sheet.createRow(0);
-                header.createCell(0).setCellValue("Table/View Name");
-                header.createCell(1).setCellValue("Type");
+                // 첫 번째 chunk에서는 헤더를 생성
+                if (sheet.getLastRowNum() == 0) {
+                    Row header = sheet.createRow(0);
+                    header.createCell(0).setCellValue("Table/View Name");
+                    header.createCell(1).setCellValue("Type");
+                }
 
-                // 데이터 작성
-                int rowNum = 1;
+                // 데이터 추가
+                int rowNum = sheet.getLastRowNum() + 1;
                 for (TableMetadata metadata : items) {
                     Row row = sheet.createRow(rowNum++);
                     row.createCell(0).setCellValue(metadata.getName());
@@ -125,5 +142,4 @@ public class DbToExcelConfiguration {
             }
         };
     }
-
 }

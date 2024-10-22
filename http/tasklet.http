@@ -1,0 +1,6 @@
+### Run tasklet
+GET localhost:8010/tasklet
+
+
+### Run tasklet async
+GET localhost:8010/tasklet-async

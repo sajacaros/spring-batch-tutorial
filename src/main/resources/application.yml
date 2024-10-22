@@ -1,5 +1,7 @@
 # H2 DataBase?
 spring:
+  profiles:
+    active: local
   application:
     name: spring-batch
   datasource:

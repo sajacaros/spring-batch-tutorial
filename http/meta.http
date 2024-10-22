@@ -1,0 +1,25 @@
+### fetch mysql metadata => save to excel
+POST localhost:8010/metadata
+Accept: application/json
+Content-Type: application/json
+
+{
+    "url": "jdbc:mysql://{{mysql.host}}:{{mysql.port}}/{{mysql.db}}?serverTimezone=UTC&characterEncoding=UTF-8",
+    "username": "{{mysql.username}}",
+    "password": "{{mysql.password}}",
+    "schema": "{{mysql.schema}}",
+    "filePath": "output/meta_mysql.xlsx"
+}
+
+### fetch postgresql metadata => save to excel
+POST localhost:8010/metadata
+Accept: application/json
+Content-Type: application/json
+
+{
+    "url": "jdbc:postgresql://{{postgresql.host}}:{{postgresql.port}}/{{postgresql.db}}",
+    "username": "{{postgresql.username}}",
+    "password": "{{postgresql.password}}",
+    "schema": "{{postgresql.schema}}",
+    "filePath": "output/meta_postgresql.xlsx"
+}
