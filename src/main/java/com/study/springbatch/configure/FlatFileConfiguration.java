@@ -8,6 +8,7 @@ import com.study.springbatch.vo.EconomicIndexChangeRate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
@@ -34,8 +35,6 @@ public class FlatFileConfiguration {
     public static final String ENCODING_TARGET = "UTF-8";
     public static final String FLAT_FILE_WRITER_CHUNK_JOB = "FLAT_FILE_WRITER_CHUNK_JOB";
 
-    private final ItemProcessor<EconomicIndex, EconomicIndexChangeRate> itemProcessor = new AggregateEconomicProcessor();
-
     @Bean
     public Job flatFileJob(Step flatFileStep, JobRepository jobRepository) {
         log.info("------------------ Init flatFileJob -----------------");
@@ -47,20 +46,21 @@ public class FlatFileConfiguration {
 
 
     @Bean
+    @JobScope
     public Step flatFileStep(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         log.info("------------------ Init flatFileStep -----------------");
-
         return new StepBuilder("flatFileStep", jobRepository)
                 .<EconomicIndex, EconomicIndexChangeRate>chunk(CHUNK_SIZE, transactionManager)
                 .reader(flatFileItemReader())
-                .processor(itemProcessor)
+                .processor(itemProcessor())
                 .writer(flatFileItemWriter())
                 .build();
     }
 
     @Bean
+    @JobScope
     public FlatFileItemReader<EconomicIndex> flatFileItemReader() {
-
+        log.info("----- itemReader -----");
         return new FlatFileItemReaderBuilder<EconomicIndex>()
                 .name("FlatFileItemReader")
                 .resource(new ClassPathResource("./data/경기종합지수_2020100__구성지표_시계열__10차__20241029175241.csv"))
@@ -73,7 +73,17 @@ public class FlatFileConfiguration {
     }
 
     @Bean
+    @JobScope
+    public ItemProcessor<EconomicIndex, EconomicIndexChangeRate> itemProcessor() {
+        log.info("----- itemProcessor -----");
+        return new AggregateEconomicProcessor();
+    }
+//    private final ItemProcessor<EconomicIndex, EconomicIndexChangeRate> itemProcessor = new AggregateEconomicProcessor();
+
+    @Bean
+    @JobScope
     public FlatFileItemWriter<EconomicIndexChangeRate> flatFileItemWriter() {
+        log.info("----- itemWriter -----");
         return new FlatFileItemWriterBuilder<EconomicIndexChangeRate>()
                 .name("flatFileItemWriter")
                 .resource(new FileSystemResource("./output/economic_rate.csv"))
@@ -84,7 +94,6 @@ public class FlatFileConfiguration {
                 .lineAggregator(new EconomicIndexAggregator())
                 .headerCallback(new EconomicIndexHeaderHandler())
                 .build();
-
     }
 
 }

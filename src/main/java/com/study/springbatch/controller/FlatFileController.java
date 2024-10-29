@@ -33,6 +33,7 @@ public class FlatFileController {
                 .toJobParameters();
 
         JobExecution run = jobLauncher.run(job, jobParameters);
+//        JobExecution run = jobLauncher.run(job, new JobParameters());
         log.info("sync] job id : {}, state : {}", run.getJobId(), run.getExitStatus());
         return run.getJobId();
     }
