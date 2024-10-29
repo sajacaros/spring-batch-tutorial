@@ -12,6 +12,6 @@ public class EconomicIndexChangeRate {
     private float value1, value2, value3, value4, value5;
 
     public String representation() {
-        return String.format("%s%%,%.2f%%,%.2f%%,%.2f%%,%.2f%%,%.2f%%", name, value1*100, value2*100, value3*100, value4*100, value5*100);
+        return String.format("%s,%.2f%%,%.2f%%,%.2f%%,%.2f%%,%.2f%%", name, value1*100, value2*100, value3*100, value4*100, value5*100);
     }
 }

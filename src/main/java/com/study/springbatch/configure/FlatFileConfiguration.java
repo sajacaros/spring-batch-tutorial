@@ -30,7 +30,8 @@ public class FlatFileConfiguration {
      * CHUNK 크기를 지정한다.
      */
     public static final int CHUNK_SIZE = 100;
-    public static final String ENCODING = "UTF-8";
+    public static final String ENCODING_ORIGIN = "EUC-KR"; // UTF-8
+    public static final String ENCODING_TARGET = "UTF-8";
     public static final String FLAT_FILE_WRITER_CHUNK_JOB = "FLAT_FILE_WRITER_CHUNK_JOB";
 
     private final ItemProcessor<EconomicIndex, EconomicIndexChangeRate> itemProcessor = new AggregateEconomicProcessor();
@@ -63,7 +64,7 @@ public class FlatFileConfiguration {
         return new FlatFileItemReaderBuilder<EconomicIndex>()
                 .name("FlatFileItemReader")
                 .resource(new ClassPathResource("./data/경기종합지수_2020100__구성지표_시계열__10차__20241029175241.csv"))
-                .encoding(ENCODING)
+                .encoding(ENCODING_ORIGIN)
                 .delimited().delimiter(",")
                 .names("name", "value1", "value2", "value3", "value4", "value5", "value6")
                 .targetType(EconomicIndex.class)
@@ -76,7 +77,7 @@ public class FlatFileConfiguration {
         return new FlatFileItemWriterBuilder<EconomicIndexChangeRate>()
                 .name("flatFileItemWriter")
                 .resource(new FileSystemResource("./output/economic_rate.csv"))
-                .encoding(ENCODING)
+                .encoding(ENCODING_TARGET)
                 .delimited().delimiter("\t")
                 .names("name", "value1", "value2", "value3", "value4", "value5")
                 .append(false)
