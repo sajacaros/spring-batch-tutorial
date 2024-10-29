@@ -1,6 +1,6 @@
 package com.study.springbatch.configure;
 
-import com.study.springbatch.QueryIdWithDB;
+import com.study.springbatch.util.QueryIdWithDB;
 import com.study.springbatch.vo.TableMetadata;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;

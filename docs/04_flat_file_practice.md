@@ -14,7 +14,7 @@
 - 단점 : 복잡한 데이터 구조 처리에 부적합
 ## FlatFileItemReader 주요 구성 요소
 - Resource: 읽을 텍스트 파일
-- LineMapper: 텍스트 파일의 각 라인을 토큰으로 분리하는 역할
+- LineMapper: 텍스트 파일의 각 라인을 Item으로 분리하는 역할
 - LineTokenizer: 텍스트 파일의 각 라인을 토큰으로 분리하는 역할
 - FieldSetMapper: 토큰을 Item의 속성에 매핑하는 역할
 - SkippableLineMapper: 오류 발생시 해당 라인 스킵
