@@ -1,4 +1,4 @@
-package com.study.springbatch;
+package com.study.springbatch.util;
 
 public enum QueryIdWithDB {
     POSTGRESQL("postgresql", "com.study.springbatch.repository.TableMetadataRepository.fetchTableMetadataPostgresql"),
