@@ -7,18 +7,15 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 10
-    url: jdbc:h2:mem:batch
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-  h2:
-    console:
-      enabled: true  # H2 Console
-      path: /h2-console  # H2 Console Path
+    driver-class-name: org.postgresql.Driver
   batch:
-    jdbc:
-      initialize-schema: always
     job:
       enabled: false
+  sql:
+    init:
+      mode: never
+  config:
+    import: classpath:secret.yml
 server:
   port: 8010
+
