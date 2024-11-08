@@ -7,7 +7,6 @@ spring:
   datasource:
     hikari:
       maximum-pool-size: 10
-    driver-class-name: org.postgresql.Driver
   batch:
     job:
       enabled: false
