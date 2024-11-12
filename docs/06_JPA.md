@@ -76,7 +76,6 @@ public JpaPagingItemReader<BatchJobExecution> batchJobExecutionJpaPagingItemRead
   - 유연성
 - 단점
   - 설정 복잡성
-  - 데이터베이스 종속
   - 오류 가능성
 ## JpaItemWriter 구성 요소
 - EntityManagerFactory
