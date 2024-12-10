@@ -1,0 +1,9 @@
+### Run next
+GET localhost:8010/next
+
+### Run on
+GET localhost:8010/on
+
+
+### Run on
+GET localhost:8010/stop

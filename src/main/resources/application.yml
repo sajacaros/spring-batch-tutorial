@@ -15,10 +15,6 @@ spring:
       mode: never
   config:
     import: classpath:secret.yml
-  cloud:
-    task:
-      initialize-enabled: false
-      name: spring-batch
 server:
   port: 8010
 
