@@ -5,5 +5,5 @@ GET localhost:8010/next
 GET localhost:8010/on
 
 
-### Run on
+### Run stop
 GET localhost:8010/stop

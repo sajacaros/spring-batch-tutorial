@@ -41,14 +41,14 @@ public class OnStepTaskJobConfiguration {
 
     @Bean(name = "onStep01")
     @JobScope
-    public Step stepOn01(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step onStep01(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         log.info("------------------ Init myStep -----------------");
 
         return new StepBuilder("onStep01", jobRepository)
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-                        log.info("Execute Step 01 Tasklet ...");
+                        log.info("------------------\nExecute Step 01 Tasklet ...\n------------------");
 
                         Random random = new Random();
                         int randomValue = random.nextInt(1000);
@@ -65,14 +65,14 @@ public class OnStepTaskJobConfiguration {
 
     @Bean(name = "onStep02")
     @JobScope
-    public Step stepOn02(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step onStep02(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         log.info("------------------ Init myStep -----------------");
 
         return new StepBuilder("onStep02", jobRepository)
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-                        log.info("Execute Step 02 Tasklet ...");
+                        log.info("------------------\nExecute Step 02 Tasklet ...\n------------------");
                         return RepeatStatus.FINISHED;
                     }
                 }, transactionManager)
@@ -81,14 +81,14 @@ public class OnStepTaskJobConfiguration {
 
     @Bean(name = "onStep03")
     @JobScope
-    public Step stepOn03(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
+    public Step onStep03(JobRepository jobRepository, PlatformTransactionManager transactionManager) {
         log.info("------------------ Init myStep -----------------");
 
         return new StepBuilder("onStep03", jobRepository)
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-                        log.info("Execute Step 03 Tasklet ...");
+                        log.info("------------------\nExecute Step 03 Tasklet ...\n------------------");
                         return RepeatStatus.FINISHED;
                     }
                 }, transactionManager)

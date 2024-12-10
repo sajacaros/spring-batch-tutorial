@@ -129,4 +129,11 @@
           .build();
   }
   ```
+- job 결과
+  - `stop` 되었을 경우에만 `STOPPED`로 표시 
+  - ![job status](./images/job_status.png)
+- step 결과
+  - `stop` 되었을 경우에는 FAILED로 표시
+  - `on`으로 정의된 조건에 따라 다음 Step으로 이동시에는 `ABANDONED`로 표시
+  - ![step status](./images/step_status.png)
 - [API 살펴보기](https://docs.spring.io/spring-batch/reference/step/controlling-flow.html)

@@ -28,6 +28,7 @@ public class StopStepTaskJobConfiguration {
     @Autowired
     PlatformTransactionManager transactionManager;
 
+
     @Bean
     public Job stopStepJob(Step stopStep01, Step stopStep02, JobRepository jobRepository) {
         log.info("------------------ Init myJob -----------------");
@@ -48,7 +49,7 @@ public class StopStepTaskJobConfiguration {
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-                        log.info("Execute Step 01 Tasklet ...");
+                        log.info("------------------\nExecute Step 01 Tasklet ...\n------------------");
 
                         Random random = new Random();
                         int randomValue = random.nextInt(1000);
@@ -72,7 +73,7 @@ public class StopStepTaskJobConfiguration {
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-                        log.info("Execute Step 02 Tasklet ...");
+                        log.info("------------------\nExecute Step 02 Tasklet ...\n------------------");
                         return RepeatStatus.FINISHED;
                     }
                 }, transactionManager)

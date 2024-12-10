@@ -17,4 +17,9 @@ spring:
     import: classpath:secret.yml
 server:
   port: 8010
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
 
